@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nexus AI Dashboard</title>
+    <style>
+        body { background: #0f172a; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; }
+        #chat-box { width: 80%; height: 400px; background: #1e293b; overflow-y: scroll; padding: 20px; border-radius: 10px; margin-top: 20px; }
+        input { width: 60%; padding: 15px; margin-top: 20px; border-radius: 5px; border: none; }
+    </style>
+</head>
+<body>
+    <h1>Nexus AI Commander Dashboard</h1>
+    <div id="chat-box"></div>
+    <input type="text" id="userInput" placeholder="Command daalo...">
+    <script>
+        document.getElementById('userInput').addEventListener('keypress', async (e) => {
+            if (e.key === 'Enter') {
+                const msg = e.target.value;
+                const res = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({message: msg})
+                });
+                const data = await res.json();
+                document.getElementById('chat-box').innerHTML += `<p><b>You:</b> ${msg}</p><p><b>AI:</b> ${data.reply}</p>`;
+                e.target.value = '';
+            }
+        });
+    </script>
+</body>
+  </html>
+  
