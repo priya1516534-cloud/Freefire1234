@@ -4,8 +4,9 @@ import google.generativeai as genai
 
 app = Flask(__name__)
 
-# Render ke Dashboard mein 'GEMINI_API_KEY' set karna
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+# API Key load
+api_key = os.getenv("GEMINI_API_KEY")
+genai.configure(api_key=api_key)
 model = genai.GenerativeModel('gemini-1.5-flash')
 
 @app.route('/')
@@ -14,9 +15,12 @@ def index():
 
 @app.route('/chat', methods=['POST'])
 def chat():
-    user_message = request.json.get("message")
-    response = model.generate_content(user_message)
-    return jsonify({"reply": response.text})
+    try:
+        user_message = request.json.get("message")
+        response = model.generate_content(user_message)
+        return jsonify({"reply": response.text})
+    except Exception as e:
+        return jsonify({"reply": "Error: API Key check karo ya system busy hai."})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(debug=True)
