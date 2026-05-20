@@ -1,32 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Nexus AI Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus AI Terminal</title>
     <style>
-        body { background: #0f172a; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; }
-        #chat-box { width: 80%; height: 400px; background: #1e293b; overflow-y: scroll; padding: 20px; border-radius: 10px; margin-top: 20px; }
-        input { width: 60%; padding: 15px; margin-top: 20px; border-radius: 5px; border: none; }
+        body { background: #0a0a0a; color: #00ffcc; font-family: 'Courier New', Courier, monospace; margin: 0; display: flex; flex-direction: column; height: 100vh; }
+        
+        /* Chat Box area */
+        #chat-box { flex: 1; overflow-y: auto; padding: 20px; border-bottom: 2px solid #333; }
+        .msg { margin-bottom: 15px; padding: 10px; border-left: 3px solid #00ffcc; background: rgba(0,255,204,0.05); }
+
+        /* Fixed Input Area */
+        #input-area { padding: 20px; background: #111; display: flex; gap: 10px; position: sticky; bottom: 0; }
+        input { flex: 1; padding: 15px; border-radius: 5px; border: 1px solid #333; background: #1a1a1a; color: white; }
+        button { padding: 15px 25px; background: #00ffcc; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #008f7a; transform: scale(1.05); }
     </style>
 </head>
 <body>
-    <h1>Nexus AI Commander Dashboard</h1>
+
+    <h2 style="text-align: center; color: #00ffcc;">NEXUS AI COMMANDER</h2>
     <div id="chat-box"></div>
-    <input type="text" id="userInput" placeholder="Command daalo...">
+
+    <div id="input-area">
+        <input type="text" id="userInput" placeholder="Command enter karo..." autocomplete="off">
+        <button onclick="sendMessage()">SEND</button>
+    </div>
+
     <script>
-        document.getElementById('userInput').addEventListener('keypress', async (e) => {
-            if (e.key === 'Enter') {
-                const msg = e.target.value;
-                const res = await fetch('/chat', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({message: msg})
-                });
-                const data = await res.json();
-                document.getElementById('chat-box').innerHTML += `<p><b>You:</b> ${msg}</p><p><b>AI:</b> ${data.reply}</p>`;
-                e.target.value = '';
-            }
-        });
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const msg = input.value;
+            if(!msg) return;
+
+            document.getElementById('chat-box').innerHTML += `<div class="msg"><b>You:</b> ${msg}</div>`;
+            input.value = '';
+
+            const res = await fetch('/chat', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message: msg})
+            });
+            const data = await res.json();
+            document.getElementById('chat-box').innerHTML += `<div class="msg" style="border-color: #ff00ff;"><b>Nexus:</b> ${data.reply}</div>`;
+            document.getElementById('chat-box').scrollTop = document.getElementById('chat-box').scrollHeight;
+        }
+
+        document.getElementById('userInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMessage(); });
     </script>
 </body>
-  </html>
-  
+</html>
